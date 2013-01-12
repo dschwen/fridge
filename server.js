@@ -87,11 +87,27 @@ io.sockets.on('connection', function (socket) {
 
   users[socket.id] = { ready: false, list: [], name: null, chat: '', vote: {}, status: 0, socket: socket };
   
-  socket.on('login', function (data) {
-    users[socket.id].name = data.name;
-    users[socket.id].status = 1;
-    socket.broadcast.emit( 'newuser', { name: users[socket.id].name } );
-    socket.emit( 'magnets', { list: selected } );
+  socket.on('dragstart', function (data) {
+    // someone is already holding it
+    if(  mag[data.n].hold !== null ) {
+    }
+
+    // otherwise broadcast pickup and log
+    socket.broadcast.emit( 'held', { n: data.n } );
+    mag[data.n].hold = socket.id;
+  });
+
+  socket.on('dragstop', function (data) {
+    // someone is holder dropping it?
+    if(  mag[data.n].hold !== socket.id ) {
+      return; // ignore spoofed event
+    }
+
+    // otherwise broadcast and set new location
+    mag[data.n].x = data.x;
+    mag[data.n].y = data.y;
+    mag[data.n].hold = null;
+    socket.broadcast.emit( 'drop', { n: data.n, x: data.x, y: data.y } );
   });
 
   socket.on('disconnect', function () {
