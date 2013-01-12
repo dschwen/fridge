@@ -3,7 +3,7 @@ var app = require('http').createServer(handler)
   , fs = require('fs')
   , mime = require('mime')
   , files = [ 
-      'lib/jquery.event.drag-2.0.min.js', 
+      'lib/jquery.event.drag-2.2.min.js', 
       'css/styles.css', 'index.html', 'favicon.ico' 
     ], cache = {}
   , alias = { '/': '/index.html' }
