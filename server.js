@@ -16,7 +16,7 @@ var app = require('http').createServer(handler)
               'is','are','am','have','be','will','want','let','can',
               'give','come','see','read','comprehend','shoot','turn','create','show',
               'the', 'the', 'a', 'an', 'all', 'no',
-              'into', 'out', 'from', 'to', 'in', 'on','with','for','about',
+              'into', 'out', 'from', 'to', 'in', 'on','with','for','about','of',
               'gigantic', 'hard', 'soft', 'intellectual', 'digital', 'burgeois',
               'interactive', 'sun','meadow',
               'ing','es','s','y',
@@ -83,9 +83,8 @@ initFridge();
 
 io.sockets.on('connection', function (socket) {
 
+  users[socket.id] = { socket: socket };
   socket.emit( 'words', mag );
-
-  users[socket.id] = { ready: false, list: [], name: null, chat: '', vote: {}, status: 0, socket: socket };
   
   socket.on('dragstart', function (data) {
     // someone is already holding it
@@ -107,43 +106,13 @@ io.sockets.on('connection', function (socket) {
     mag[data.n].x = data.x;
     mag[data.n].y = data.y;
     mag[data.n].hold = null;
-    socket.broadcast.emit( 'drop', { n: data.n, x: data.x, y: data.y } );
+    io.sockets.emit( 'move', { n: data.n, x: data.x, y: data.y } );
   });
 
   socket.on('disconnect', function () {
     io.sockets.emit('userleft', { name: users[socket.id].name } );
     users[socket.id] = undefined;
   });
-
-  socket.on('vote', function (data) {
-    // is the vote open (callback set)
-    if( votes[data.item] === undefined ) {
-      console.log('Cheating! Voting on closed vote!');
-      return false;
-    }
-    if( votes[data.item].status !== users[socket.id].status ) {
-      console.log('User is not in the correct status!');
-      return false;
-    }
-
-    // apply vote and vheck consensus
-    users[socket.id].vote[data.item] = data.vote;
-    var consensus = checkConsensus(data.item),
-        callback = votes[data.item].fn;
-    if( consensus !== undefined ) {
-      closeVote(data.item);
-      callback(consensus);
-    }
-  });
-
-  // edit events get applied to the server copy of the map and rebroadcast to all clients
-  socket.on('update', function (data) {
-    //socket.broadcast.emit( 'update', data );
-    if( users[socket.id].status === 2 ) {
-      users[socket.id].list[data.n] = data.word;
-      console.log(data);
-    }
-  } );
 
 
 });

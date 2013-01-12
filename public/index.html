@@ -3,9 +3,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
     <script src="/lib/jquery.event.drag-2.2.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Nunito:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/css/styles.css"/>
   </head>
   <body>
+    <div style="float: right; margin: 5px">
+      <div class="g-plusone" data-size="tall"></div>
+<!--
+<div class="g-plus" data-height="69" data-href="//plus.google.com/112937780504131431960" data-rel="author"></div>-->
+    </div>
     <div id="fridge"></div>
 
     <script>
@@ -25,11 +31,19 @@
               })
               .text(m.word)
               .appendTo(f)
-              .drag(function( ev, dd ){
+              .drag('start',function(){
+                socket.emit('dragstart',{n:i});
+                m.div.fadeTo(100,0.5);
+              })
+              .drag(function(e,dd){
                 $(this).css({
                   top: m.y + dd.deltaY,
                   left: m.x + dd.deltaX
                 });
+              })
+              .drag('end',function(e,dd){
+                socket.emit('dragstop',{n:i,x: m.x + dd.deltaX, y:m.y + dd.deltaY});
+                m.div.fadeTo(100,1);
               });
           })(i);
         }
@@ -42,25 +56,25 @@
           'reconnection delay': 500,
           'max reconnection attempts': 10
         });
-      })();
       
-      // react to the outcome of a vote/consensus decission
-      socket.on( 'words', function (data) {
-        mag = data;
-        buildWords();
-      } );
+        // receive initial magnet collection
+        socket.on( 'words', function (data) {
+          mag = data;
+          buildWords();
+        } );
 
-      // user handling/info events
-      socket.on( 'newuser', function (data) {
-        $('#log').append( $('<div></div').text( 'user ' + data.name + ' joined the game' ) );
-      } );
-      socket.on( 'userleft', function (data) {
-        $('#log').append( $('<div></div').text( 'user ' + data.name + ' left' ) );
-      } );
-      socket.on('disconnect', function () {
-        $('#log').append( $('<div></div').text( "Disconnected :-(" ) );
-        //socket.socket.connect( l.protocol + '//' + l.host );
-      });
+        // move a magnet
+        socket.on( 'move', function (data) {
+          console.log('move',data);
+          var m = mag[data.n];
+          m.x = data.x;
+          m.y = data.y;
+          m.div.css({
+            'top': m.y, 'left': m.x,
+          });
+        } );
+      })();
     </script>
+    <script type="text/javascript" src="https://apis.google.com/js/plusone.js">English (US)</script>    
   </body>
 </html>
