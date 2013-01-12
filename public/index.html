@@ -12,18 +12,26 @@
       var l = document.location, socket, mag;
 
       function buildWords() {
-        var i, m, f = $('#fridge').html('');
+        var i, f = $('#fridge').html('');
         for( i=0; i<mag.length; ++i ) {
-          m = mag[i];
-          m.div = $('<div></div>')
-            .addClass('magnet')
-            .css({
-              'top': m.y, 'left': m.x,
-              '-webkit-transform' :'rotate('+m.phi+'deg)',
-              '-moz-transform' :'rotate('+m.phi+'deg)'
-            })
-            .text(m.word)
-            .appendTo(f);
+          (function(i){
+            var m = mag[i];
+            m.div = $('<div></div>')
+              .addClass('magnet')
+              .css({
+                'top': m.y, 'left': m.x,
+                '-webkit-transform' :'rotate('+m.phi+'deg)',
+                '-moz-transform' :'rotate('+m.phi+'deg)'
+              })
+              .text(m.word)
+              .appendTo(f)
+              .drag(function( ev, dd ){
+                $(this).css({
+                  top: m.y + dd.deltaY,
+                  left: m.x + dd.deltaX
+                });
+              });
+          })(i);
         }
       }
 
