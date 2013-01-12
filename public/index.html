@@ -5,5 +5,54 @@
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/css/styles.css"/>
   </head>
-  <div id="fridge"></div>
+  <body>
+    <div id="fridge"></div>
+
+    <script>
+      var l = document.location, socket, mag = [];
+
+      function buildWords() {
+        var i, m, f = $('#fridge');
+        for( i=0; i<mag.length; ++i ) {
+          m = mag[i];
+          m.div = $('<div></div>')
+            .addClass('magnet')
+            .css({
+              'top': m.y, 'left': m.x,
+              '-webkit-transform' :'rotate('+m.phi+'deg)',
+              '-moz-transform' :'rotate('+m.phi+'deg)'
+            })
+            .text(m.word)
+            .appendTo(f);
+        }
+      }
+
+      // initialization
+      (function(){
+        socket = io.connect( l.protocol + '//' + l.host, {
+          'reconnect': true,
+          'reconnection delay': 500,
+          'max reconnection attempts': 10
+        });
+      })();
+      
+      // react to the outcome of a vote/consensus decission
+      socket.on( 'words', function (data) {
+        mag = data;
+        buildWords();
+      } );
+
+      // user handling/info events
+      socket.on( 'newuser', function (data) {
+        $('#log').append( $('<div></div').text( 'user ' + data.name + ' joined the game' ) );
+      } );
+      socket.on( 'userleft', function (data) {
+        $('#log').append( $('<div></div').text( 'user ' + data.name + ' left' ) );
+      } );
+      socket.on('disconnect', function () {
+        $('#log').append( $('<div></div').text( "Disconnected :-(" ) );
+        //socket.socket.connect( l.protocol + '//' + l.host );
+      });
+    </script>
+  </body>
 </html>

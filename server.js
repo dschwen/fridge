@@ -73,7 +73,8 @@ function initFridge() {
       word: words[i], 
       hold: null,
       x: Math.floor(Math.random()*700), 
-      y: Math.floor(Math.random()*550)
+      y: Math.floor(Math.random()*550),
+      phi: Math.floor(Math.random()*600.0-300.0)/100.0
     })
   }
 }
@@ -81,14 +82,15 @@ initFridge();
 
 io.sockets.on('connection', function (socket) {
 
-  socket.emit( 'ready', { motd: '' } );
+  socket.emit( 'words', mag );
+
   users[socket.id] = { ready: false, list: [], name: null, chat: '', vote: {}, status: 0, socket: socket };
   
   socket.on('login', function (data) {
     users[socket.id].name = data.name;
     users[socket.id].status = 1;
     socket.broadcast.emit( 'newuser', { name: users[socket.id].name } );
-    socket.emit( 'categories', { list: selected } );
+    socket.emit( 'magnets', { list: selected } );
   });
 
   socket.on('disconnect', function () {

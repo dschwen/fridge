@@ -9,6 +9,21 @@ body {
   padding: 0;
   top: 50%; left: 50%;
   border: 1px solid #444;
-  background-color: #fff;
+  background-color: #f7f7f7;
   position: absolute;
+  overflow: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+.magnet {
+  position: absolute;
+  display: inline-block;
+  padding: 0 0.2em 0 0.2em;
+  background-color: #fff;
+  border: 1px solid #666;
+  border-right: 2px solid black;
+  border-bottom: 2px solid black;
+  cursor: hand;
 }
