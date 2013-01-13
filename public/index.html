@@ -44,6 +44,9 @@
               .drag('end',function(e,dd){
                 socket.emit('dragstop',{n:i,x: m.x + dd.deltaX, y:m.y + dd.deltaY});
                 m.div.fadeTo(100,1);
+              })
+              .bind('transitionend', function() {
+                m.div.removeClass('tran');
               });
           })(i);
         }
@@ -69,6 +72,7 @@
           var m = mag[data.n];
           m.x = data.x;
           m.y = data.y;
+          m.div.addClass('tran');
           m.div.css({
             'top': m.y, 'left': m.x,
           });

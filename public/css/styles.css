@@ -28,3 +28,12 @@ body {
   border-bottom: 2px solid black;
   cursor: hand;
 }
+
+.tran {
+  -webkit-transition-property: top, left;
+  -webkit-transition-duration: 1s;
+  -webkit-transition-timing-function: ease-out;
+  transition-property: top, left;
+  transition-duration: 1s;
+  transition-timing-function: ease-out;
+}
