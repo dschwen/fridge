@@ -10,38 +10,48 @@ var app = require('http').createServer(handler)
   , i,j,k
   , words = [ 'face','head','pipe','computer','server','screen','link','knowledge',
               'shower', 'crowd', 'Google+', 'Facebook','JavaScript','community',
-              'envy','passion','love',
+              'envy','passion','love','ski','outdoors','hole',
               'fresh', 'full', 'bursting','delicious',
               'he','she','it','me','I','you','your','then','if',
-              'is','are','am','have','be','will','want','let','can',
+              'is','are','am','have','be','will','want','let','can','live',
               'give','come','see','read','comprehend','shoot','turn','create','show',
               'the', 'the', 'a', 'an', 'all', 'no',
               'into', 'out', 'from', 'to', 'in', 'on','with','for','about','of',
               'gigantic', 'hard', 'soft', 'intellectual', 'digital', 'burgeois',
+              'tiny','porcupine','good','loud',
               'interactive', 'sun','meadow',
               'ing','es','s','y',
               'and','or','not','never','always','sometime','some','any',
-              'chocolate','brown','blue','red','right','wrong','weak','strong'
+              'chocolate','brown','blue','red','right','wrong','weak','strong',
+              'dark'
           ]
   , users = {}
   , mag = []
+  , db = require("mongojs").connect('storm/fridge', ['moves'])                             
 ;
-  //, mongodb = require('mongodb'), db, mcol = null, map = {d:[]}
 
-// build file cache
+// build file cache and watch files
 function addToCache(file) {
-  fs.readFile( __dirname + '/public/' + file,
+  var path =  __dirname + '/public/' + file;
+  fs.readFile( path,
   function( err, data ) {
     if( err ) {
       throw err;
     }
-    cache['/'+file] = { data: data, type: mime.lookup(__dirname + '/' + file) };
+    if( !cache['/'+file] ) {
+      fs.watch( path, function(e) {
+        if( e === 'change' ) {
+          console.log( "Reloading file ", path );
+          addToCache(file);
+        }
+      });
+    }
+    cache['/'+file] = { data: data, type: mime.lookup(path) };
   });
 }
 for( i = 0; i < files.length; ++i ) {
   addToCache(files[i]);
 }
-
 
 // start listening on port
 app.listen( process.env.PORT || 8080 );
@@ -78,6 +88,15 @@ function initFridge() {
       phi: Math.floor(Math.random()*600.0-300.0)/100.0
     })
   }
+
+  // write new config to db
+  db.moves.save( { mag: mag, t: (new Date()).getTime() }, function(err,saved){
+    if( err || !saved ) {
+      console.log("Could not store config in database!");
+    } else {
+      console.log("Store config in database!");
+    }
+  });
 }
 initFridge();
 
@@ -106,7 +125,18 @@ io.sockets.on('connection', function (socket) {
     mag[data.n].x = data.x;
     mag[data.n].y = data.y;
     mag[data.n].hold = null;
-    io.sockets.emit( 'move', { n: data.n, x: data.x, y: data.y } );
+    var d = { n: data.n, x: data.x, y: data.y };
+    io.sockets.emit( 'move', d );
+
+    // write move to DB
+    d.t = (new Date()).getTime();
+    db.moves.save( d, function(err,saved){
+      if( err || !saved ) {
+        console.log("Could not move config in database!");
+      } else {
+        console.log("Store move in database!");
+      }
+    });
   });
 
   socket.on('disconnect', function () {
