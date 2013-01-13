@@ -33,7 +33,7 @@
               .appendTo(f)
               .drag('start',function(){
                 socket.emit('dragstart',{n:i});
-                m.div.fadeTo(100,0.5);
+                m.div.fadeTo(100,0.5).removeClass('tran');
               })
               .drag(function(e,dd){
                 $(this).css({
