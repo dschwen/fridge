@@ -13,17 +13,18 @@ var app = require('http').createServer(handler)
               'envy','passion','love','ski','outdoors','hole',
               'fresh', 'full', 'bursting','delicious',
               'he','she','it','me','I','you','your','then','if',
-              'is','are','am','have','be','will','want','let','can','live',
+              'is','is','are','am','have','be','will','want','let','can','live',
               'give','come','see','read','comprehend','shoot','turn','create','show',
-              'the', 'the', 'a', 'an', 'all', 'no',
+              'the', 'the', 'a','a', 'an', 'all', 'no',
               'into', 'out', 'from', 'to', 'in', 'on','with','for','about','of',
               'gigantic', 'hard', 'soft', 'intellectual', 'digital', 'burgeois',
               'tiny','porcupine','good','loud',
               'interactive', 'sun','meadow',
               'ing','es','s','y',
+
               'and','or','not','never','always','sometime','some','any',
               'chocolate','brown','blue','red','right','wrong','weak','strong',
-              'dark'
+              'dark','?'
           ]
   , users = {}
   , mag = []
