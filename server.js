@@ -17,7 +17,7 @@ var app = require('http').createServer(handler)
               'is','is','are','am','have','be','will','want','let','can','live',
               'give','come','see','read','comprehend','shoot','turn','create','show',
               'eat','sleep','night','day','sun','moon','time','talk','run','walk',
-              'the', 'the', 'a','a', 'an', 'all', 'no',
+              'the', 'the', 'a','a', 'an', 'all', 'no','before','after',
               'into', 'out', 'from', 'to', 'in', 'on','with','for','about','of',
               'gigantic', 'hard', 'soft', 'intellectual', 'digital', 'burgeois',
               'tiny','porcupine','good','loud',
