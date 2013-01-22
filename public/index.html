@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="/css/styles.css"/>
   </head>
   <body>
+    <div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+    <div style="float: right; margin: 5px">
+       <div class="fb-like" data-href="http://fridge.schwen.de" data-send="false" data-layout="box_count" data-width="450" data-show-faces="true"></div>
+    </div>
     <div style="float: right; margin: 5px">
       <div class="g-plusone" data-size="tall"></div>
 <!-- 
@@ -68,7 +80,6 @@
 
         // move a magnet
         socket.on( 'move', function (data) {
-          console.log('move',data);
           var m = mag[data.n];
           m.x = data.x;
           m.y = data.y;
@@ -82,3 +93,4 @@
     <script type="text/javascript" src="https://apis.google.com/js/plusone.js">English (US)</script>    
   </body>
 </html>
+

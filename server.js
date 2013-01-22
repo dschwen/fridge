@@ -56,8 +56,13 @@ for( i = 0; i < files.length; ++i ) {
   addToCache(files[i]);
 }
 
-// start listening on port
-app.listen( process.env.PORT || 8080 );
+exports.start = function( options ) {
+  // start listening on port
+  app.listen( options.port );
+}
+exports.stop = function() {
+  app.close();
+}
 
 // serve cached files, return error if not explicitly listed in files table
 function handler( req, res ) {
