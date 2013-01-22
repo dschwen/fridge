@@ -30,7 +30,7 @@ var app = require('http').createServer(handler)
           ]
   , users = {}
   , mag = []
-  , db = require("mongojs").connect('storm/fridge', ['moves'])                             
+  , db = null //require("mongojs").connect('storm/fridge', ['moves'])                             
 ;
 
 // build file cache and watch files
@@ -93,13 +93,15 @@ function initFridge() {
   }
 
   // write new config to db
-  db.moves.save( { mag: mag, t: (new Date()).getTime() }, function(err,saved){
-    if( err || !saved ) {
-      console.log("Could not store config in database!");
-    } else {
-      console.log("Store config in database!");
-    }
-  });
+  if( db ) {
+    db.moves.save( { mag: mag, t: (new Date()).getTime() }, function(err,saved){
+      if( err || !saved ) {
+        console.log("Could not store config in database!");
+      } else {
+        console.log("Store config in database!");
+      }
+    });
+  }
 }
 initFridge();
 
@@ -133,13 +135,15 @@ io.sockets.on('connection', function (socket) {
 
     // write move to DB
     d.t = (new Date()).getTime();
-    db.moves.save( d, function(err,saved){
-      if( err || !saved ) {
-        console.log("Could not move config in database!");
-      } else {
-        console.log("Store move in database!");
-      }
-    });
+    if( db ) {
+      db.moves.save( d, function(err,saved){
+        if( err || !saved ) {
+          console.log("Could not move config in database!");
+        } else {
+          console.log("Store move in database!");
+        }
+      });
+    }
   });
 
   socket.on('disconnect', function () {
