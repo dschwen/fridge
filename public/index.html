@@ -8,44 +8,47 @@
   </head>
   <body>
     <div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
+    <script>
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
 
     <div style="float: right; margin: 5px">
        <div class="fb-like" data-href="http://fridge.schwen.de" data-send="false" data-layout="box_count" data-width="450" data-show-faces="true"></div>
     </div>
     <div style="float: right; margin: 5px">
       <div class="g-plusone" data-size="tall"></div>
-<!-- 
-<div class="g-plus" data-height="69" data-href="//plus.google.com/112937780504131431960" data-rel="author"></div>-->
+      <!-- <div class="g-plus" data-height="69" data-href="//plus.google.com/112937780504131431960" data-rel="author"></div>-->
     </div>
     <div id="fridge"></div>
 
     <script>
       var l = document.location, socket, mag;
 
-      function buildWords() {
+      function buildWords()
+      {
         var i, f = $('#fridge').html('');
-        for( i=0; i<mag.length; ++i ) {
-          (function(i){
+        for( i=0; i<mag.length; ++i )
+        {
+          (function(i) {
             var m = mag[i];
             m.div = $('<div></div>')
               .addClass('magnet')
               .css({
                 'top': m.y, 'left': m.x,
-                '-webkit-transform' :'rotate('+m.phi+'deg)',
-                '-moz-transform' :'rotate('+m.phi+'deg)'
+                '-webkit-transform' :'rotate(' + m.phi + 'deg)',
+                '-moz-transform' :'rotate(' + m.phi + 'deg)'
               })
               .text(m.word)
               .appendTo(f)
-              .drag('start',function(){
-                socket.emit('dragstart',{n:i});
-                m.div.fadeTo(100,0.5).removeClass('tran');
+              .drag('start', function() {
+                socket.emit('dragstart', {n: i});
+                m.div.fadeTo(100, 0.5).removeClass('tran');
               })
               .drag(function(e,dd){
                 $(this).css({
@@ -54,8 +57,8 @@
                 });
               })
               .drag('end',function(e,dd){
-                socket.emit('dragstop',{n:i,x: m.x + dd.deltaX, y:m.y + dd.deltaY});
-                m.div.fadeTo(100,1);
+                socket.emit('dragstop', {n: i, x: m.x + dd.deltaX, y: m.y + dd.deltaY});
+                m.div.fadeTo(100, 1);
               })
               .bind('transitionend', function() {
                 m.div.removeClass('tran');
@@ -65,21 +68,21 @@
       }
 
       // initialization
-      (function(){
-        socket = io.connect( l.protocol + '//' + l.host, {
+      (function() {
+        socket = io.connect(l.protocol + '//' + l.host, {
           'reconnect': true,
           'reconnection delay': 500,
           'max reconnection attempts': 10
         });
-      
+
         // receive initial magnet collection
-        socket.on( 'words', function (data) {
+        socket.on('words', function (data) {
           mag = data;
           buildWords();
-        } );
+        });
 
         // move a magnet
-        socket.on( 'move', function (data) {
+        socket.on('move', function (data) {
           var m = mag[data.n];
           m.x = data.x;
           m.y = data.y;
@@ -87,10 +90,9 @@
           m.div.css({
             'top': m.y, 'left': m.x,
           });
-        } );
+        });
       })();
     </script>
-    <script type="text/javascript" src="https://apis.google.com/js/plusone.js">English (US)</script>    
+    <script type="text/javascript" src="https://apis.google.com/js/plusone.js">English (US)</script>
   </body>
 </html>
-
