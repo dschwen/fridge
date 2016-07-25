@@ -1,0 +1,29 @@
+{
+  "name": "fridge",
+  "version": "1.0.0",
+  "description": "Magnetic fridge poetry",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dschwen/fridge.git"
+  },
+  "keywords": [
+    "websockets",
+    "fridge",
+    "magnet"
+  ],
+  "author": "Daniel Schwen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dschwen/fridge/issues"
+  },
+  "homepage": "https://github.com/dschwen/fridge#readme",
+  "dependencies": {
+    "mime": "^1.3.4",
+    "socket.io": "^1.4.8"
+  }
+}

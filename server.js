@@ -2,9 +2,9 @@ var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs')
   , mime = require('mime')
-  , files = [ 
-      'lib/jquery.event.drag-2.2.min.js', 
-      'css/styles.css', 'index.html', 'favicon.ico' 
+  , files = [
+      'lib/jquery.event.drag-2.2.min.js',
+      'css/styles.css', 'index.html', 'favicon.ico'
     ], cache = {}
   , alias = { '/': '/index.html' }
   , i,j,k
@@ -30,77 +30,85 @@ var app = require('http').createServer(handler)
           ]
   , users = {}
   , mag = []
-  , db = null //require("mongojs").connect('storm/fridge', ['moves'])                             
+  , db = null //require("mongojs").connect('storm/fridge', ['moves'])
 ;
 
 // build file cache and watch files
-function addToCache(file) {
+function addToCache(file)
+{
   var path =  __dirname + '/public/' + file;
   fs.readFile( path,
   function( err, data ) {
     if( err ) {
       throw err;
     }
-    if( !cache['/'+file] ) {
-      fs.watch( path, function(e) {
-        if( e === 'change' ) {
-          console.log( "Reloading file ", path );
+
+    if (!cache['/'+file])
+    {
+      fs.watch(path, function(e) {
+        if (e === 'change') {
+          console.log("Reloading file ", path);
           addToCache(file);
         }
       });
     }
+
     cache['/'+file] = { data: data, type: mime.lookup(path) };
   });
 }
+
 for( i = 0; i < files.length; ++i ) {
   addToCache(files[i]);
 }
 
-exports.start = function( options ) {
+exports.start = function(options) {
   // start listening on port
-  app.listen( options.port );
+  app.listen(options.port);
 }
+
 exports.stop = function() {
   app.close();
 }
 
 // serve cached files, return error if not explicitly listed in files table
-function handler( req, res ) {
+function handler(req, res)
+{
   console.log(req.url);
 
   // apply aliasing
-  if( alias[req.url] ) {
+  if (alias[req.url]) {
     req.url = alias[req.url];
-  } 
+  }
 
   // trap invalid requests
-  if( !cache[req.url] ) {
+  if (!cache[req.url]) {
     res.writeHead(500);
     return res.end('Error loading ' + req.url);
   }
 
-  res.writeHead( 200, { 'Content-Type': cache[req.url].type } );
+  res.writeHead(200, { 'Content-Type': cache[req.url].type });
   res.end(cache[req.url].data);
 }
 
 // init game
-function initFridge() {
+function initFridge()
+{
   //users[id].socket.emit('stopround', { list: users[id].list } );
   var i;
-  for( i = 0; i < words.length; ++i ) {
+  for (i = 0; i < words.length; ++i) {
     mag.push({
-      word: words[i], 
+      word: words[i],
       hold: null,
-      x: Math.floor(Math.random()*700), 
+      x: Math.floor(Math.random()*700),
       y: Math.floor(Math.random()*550),
       phi: Math.floor(Math.random()*600.0-300.0)/100.0
     })
   }
 
   // write new config to db
-  if( db ) {
-    db.moves.save( { mag: mag, t: (new Date()).getTime() }, function(err,saved){
-      if( err || !saved ) {
+  if (db) {
+    db.moves.save({ mag: mag, t: (new Date()).getTime()}, function(err, saved) {
+      if (err || !saved) {
         console.log("Could not store config in database!");
       } else {
         console.log("Store config in database!");
@@ -108,26 +116,27 @@ function initFridge() {
     });
   }
 }
+
 initFridge();
 
 io.sockets.on('connection', function (socket) {
-
   users[socket.id] = { socket: socket };
-  socket.emit( 'words', mag );
-  
+  socket.emit('words', mag);
+
   socket.on('dragstart', function (data) {
     // someone is already holding it
-    if(  mag[data.n].hold !== null ) {
+    if (mag[data.n].hold !== null) {
+      return;
     }
 
     // otherwise broadcast pickup and log
-    socket.broadcast.emit( 'held', { n: data.n } );
+    socket.broadcast.emit('held', { n: data.n });
     mag[data.n].hold = socket.id;
   });
 
   socket.on('dragstop', function (data) {
     // someone is holder dropping it?
-    if(  mag[data.n].hold !== socket.id ) {
+    if (mag[data.n].hold !== socket.id) {
       return; // ignore spoofed event
     }
 
@@ -136,13 +145,13 @@ io.sockets.on('connection', function (socket) {
     mag[data.n].y = data.y;
     mag[data.n].hold = null;
     var d = { n: data.n, x: data.x, y: data.y };
-    io.sockets.emit( 'move', d );
+    io.sockets.emit('move', d);
 
     // write move to DB
     d.t = (new Date()).getTime();
-    if( db ) {
-      db.moves.save( d, function(err,saved){
-        if( err || !saved ) {
+    if (db) {
+      db.moves.save(d, function(err, saved) {
+        if (err || !saved) {
           console.log("Could not move config in database!");
         } else {
           console.log("Store move in database!");
@@ -155,7 +164,4 @@ io.sockets.on('connection', function (socket) {
     io.sockets.emit('userleft', { name: users[socket.id].name } );
     users[socket.id] = undefined;
   });
-
-
 });
-
